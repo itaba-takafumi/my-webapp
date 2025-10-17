@@ -1,38 +1,42 @@
-.App {
-  text-align: center;
+import React, { useEffect, useState } from "react";
+import { getMemos, createMemo, updateMemo, deleteMemo } from "./services/memoService";
+import MemoForm from "./components/MemoForm";
+import MemoList from "./components/MemoList";
+
+function App() {
+  const [memos, setMemos] = useState([]);
+
+  const fetchMemos = async () => {
+    const res = await getMemos();
+    setMemos(res.data);
+  };
+
+  useEffect(() => {
+    fetchMemos();
+  }, []);
+
+  const handleAdd = async (newMemo) => {
+    await createMemo({ content: newMemo });
+    await fetchMemos();
+  };
+
+  const handleDelete = async (id) => {
+    await deleteMemo(id);
+    await fetchMemos();
+  };
+
+  const handleUpdate = async (id, updatedContent) => {
+    await updateMemo(id, { content: updatedContent });
+    await fetchMemos();
+  };
+
+  return (
+    <div style={{ padding: "20px" }}>
+      <h1>メモ帳</h1>
+      <MemoForm onAdd={handleAdd} />
+      <MemoList memos={memos} onDelete={handleDelete} onUpdate={handleUpdate} />
+    </div>
+  );
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
+export default App;
